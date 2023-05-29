@@ -16,21 +16,13 @@ public final class LibroPersistencia extends DAO {
 
     public void crearLibro(String nombre, String ed, String autor) {
 
-        Libro libro = new Libro();
-        Editorial editorial = new Editorial();
-        editorial.setNombre(ed);
+        Editorial editorial = new Editorial(ed);
         Autor au = new AutorPersistencia().buscarAutorPorNombre(autor);
-
+        Libro libro = new Libro(nombre, au, editorial);
+        
         try {
-            conectarBD();
-            em.getTransaction().begin();
-            libro.setTitulo(nombre);
-            libro.setEditorial(editorial);
-            libro.setAutor(au);
-            em.getTransaction().commit();
-            desconcectarBD();
+            guardarBD(libro);
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
 
@@ -39,10 +31,8 @@ public final class LibroPersistencia extends DAO {
     public Libro buscarLibroPorTitulo(String titulo) {
         try {
             conectarBD();
-            em.getTransaction().begin();
             Libro libro = (Libro) em.createQuery("SELECT l FROM Libro l WHERE l.titulo = :titulo")
                     .setParameter("titulo", titulo).getSingleResult();
-            em.getTransaction().commit();
             desconcectarBD();
             return libro;
         } catch (Exception e) {
@@ -55,10 +45,8 @@ public final class LibroPersistencia extends DAO {
 
         try {
             conectarBD();
-            em.getTransaction().begin();
             Libro libro = (Libro) em.createQuery("SELECT l FROM Libro l WHERE l.isbn = :isbn")
                     .setParameter("isbn", isbn).getSingleResult();
-            em.getTransaction().commit();
             desconcectarBD();
             return libro;
         } catch (Exception e) {
@@ -69,14 +57,8 @@ public final class LibroPersistencia extends DAO {
 
     public void borrarLibroPorTitulo(String titulo) {
         try {
-            Libro libro = buscarLibroPorTitulo(titulo);
-            conectarBD();
-            em.getTransaction().begin();
-            em.remove(libro);
-            em.getTransaction().commit();
-            desconcectarBD();
+            borrarBD(buscarLibroPorTitulo(titulo));
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
 
@@ -84,14 +66,21 @@ public final class LibroPersistencia extends DAO {
 
     public void borrarLibroPorIsbn(String isbn) {
         try {
-            Libro libro = buscarLibroPorIsbn(isbn);
-            conectarBD();
-            em.getTransaction().begin();
-            em.remove(libro);
-            em.getTransaction().commit();
-            desconcectarBD();
+            borrarBD(buscarLibroPorIsbn(isbn));
         } catch (Exception e) {
-            desconcectarBD();
+            throw e;
+        }
+
+    }
+    
+    public void borrarListaLibroPorEditorial(String nombre) {
+        try {
+            ArrayList <Libro> lista = buscarLibroPorEditorial(nombre);
+            
+            for (Libro aux : lista) {
+                borrarBD(aux);
+            }            
+        } catch (Exception e) {
             throw e;
         }
 
@@ -100,6 +89,7 @@ public final class LibroPersistencia extends DAO {
     public void editarLibroPorTitulo(String tituloAnterior, String tituloNuevo) throws Exception {
         try {
             Libro libro = buscarLibroPorTitulo(tituloAnterior);
+            libro.setTitulo(tituloNuevo);
             editarBD(libro);
         } catch (Exception e) {
             throw new Exception("el titulo del libro no existe");
@@ -110,6 +100,7 @@ public final class LibroPersistencia extends DAO {
     public void editarLibroPorIsbn(String isbnAnterior, String isbnNuevo) throws Exception {
         try {
             Libro libro = buscarLibroPorIsbn(isbnAnterior);
+            libro.setIsbn(isbnNuevo);
             editarBD(libro);
         } catch (Exception e) {
             throw new Exception("el titulo del libro no existe");
@@ -117,11 +108,10 @@ public final class LibroPersistencia extends DAO {
 
     }
     
-    public Collection <Libro> buscarLibroPorAutor(String nombre){
-        Collection<Libro> listaLibros = new ArrayList();
+    public ArrayList <Libro> buscarLibroPorAutor(String nombre){
         try {
             conectarBD();
-            listaLibros = em.createQuery("SELECT l FROM Libro l WHERE l.autor = :nombre")
+            ArrayList <Libro> listaLibros = (ArrayList <Libro>) em.createQuery("SELECT l FROM Libro l WHERE l.autor = :nombre")
                     .setParameter("nombre", nombre).getResultList();
             return listaLibros;
         } catch (Exception e) {
@@ -130,11 +120,10 @@ public final class LibroPersistencia extends DAO {
         }
     }
     
-    public Collection <Libro> buscarLibroPorEditorial(String nombre){
-        Collection<Libro> listaLibros = new ArrayList();
+    public ArrayList <Libro> buscarLibroPorEditorial(String nombre){
         try {
             conectarBD();
-            listaLibros = em.createQuery("SELECT l FROM Libro l WHERE l.editorial = :nombre")
+            ArrayList <Libro> listaLibros = (ArrayList <Libro>) em.createQuery("SELECT l FROM Libro l WHERE l.editorial = :nombre")
                     .setParameter("nombre", nombre).getResultList();
             return listaLibros;
         } catch (Exception e) {

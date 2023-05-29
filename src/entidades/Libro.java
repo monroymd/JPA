@@ -37,6 +37,14 @@ public class Libro implements Serializable {
     public Libro() {
     }
 
+    public Libro(String titulo, Autor autor, Editorial editorial) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.editorial = editorial;
+    }
+    
+    
+
     public Libro(String isbn, String titulo, Integer anio, Integer ejemplares, Integer ejemplaresPrestados, Integer ejemplaresRestantes, Boolean alta, Autor autor, Editorial editorial) {
         this.isbn = isbn;
         this.titulo = titulo;

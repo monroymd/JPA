@@ -37,6 +37,13 @@ public class DAO<T> {
         em.getTransaction().commit();
         desconcectarBD();
     }
+    protected void borrarBD(T objeto){
+        conectarBD();
+        em.getTransaction().begin();
+        em.remove(objeto);
+        em.getTransaction().commit();
+        desconcectarBD();
+    }
     
     
 }

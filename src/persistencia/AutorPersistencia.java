@@ -16,10 +16,21 @@ public class AutorPersistencia extends DAO {
     public Autor buscarAutorPorNombre(String nombre) {
         try {
             conectarBD();
-            em.getTransaction().begin();
             Autor autor = (Autor) em.createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
                     .setParameter("nombre", nombre).getSingleResult();
-            em.getTransaction().commit();
+            desconcectarBD();
+            return autor;
+        } catch (Exception e) {
+            desconcectarBD();
+            throw e;
+        }
+    }
+
+    public Autor buscarAutorPorId(String id) {
+        try {
+            conectarBD();
+            Autor autor = (Autor) em.createQuery("SELECT a FROM Autor a WHERE a.id :id")
+                    .setParameter("id", id).getSingleResult();
             desconcectarBD();
             return autor;
         } catch (Exception e) {
@@ -29,12 +40,9 @@ public class AutorPersistencia extends DAO {
     }
 
     public void guardarAutorPorNombre(String nombre) {
-        Autor autor = new Autor();
+        Autor autor = new Autor(nombre);
         try {
-            conectarBD();
-            autor.setNombre(nombre);
             guardarBD(autor);
-            desconcectarBD();
         } catch (Exception e) {
             desconcectarBD();
             throw e;
@@ -44,60 +52,35 @@ public class AutorPersistencia extends DAO {
     public void editarAutor(String nombreAnterior, String nuevoNombre) {
         try {
             Autor autor = buscarAutorPorNombre(nombreAnterior);
-            conectarBD();
-            em.getTransaction().begin();
             autor.setNombre(nuevoNombre);
             editarBD(autor);
-            desconcectarBD();
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
     }
 
-    public void borrarAutor(Autor autor) {
-        try {
-            conectarBD();
-            em.getTransaction().begin();
-            em.remove(autor);
-            em.getTransaction().commit();
-            desconcectarBD();
-        } catch (Exception e) {
-            desconcectarBD();
-            throw e;
-        }
-    }
-    
     public void borrarAutorporId(String id) {
 
         try {
-            conectarBD();
-            Autor autor = (Autor) em.createQuery("SELECT a FROM Autor a WHERE a.id = :id")
-                    .setParameter("id", id).getSingleResult();
-            borrarAutor(autor);
-            desconcectarBD();
+            borrarBD(buscarAutorPorId(id));
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
     }
-    
+
     public void borrarAutorPorNombre(String nombre) {
 
         try {
-            Autor autor = buscarAutorPorNombre(nombre);
-            borrarAutor(autor);
+            borrarBD(buscarAutorPorNombre(nombre));
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
     }
-    
-    public Collection<Autor> listaAutorPorNombre(String nombre){
-        Collection<Autor> lista = new ArrayList();
+
+    public ArrayList<Autor> listaAutorPorNombre(String nombre) {
         try {
             conectarBD();
-            lista = em.createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
+            ArrayList<Autor> lista = (ArrayList<Autor>) em.createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
                     .setParameter("nombre", nombre).getResultList();
             desconcectarBD();
             for (Autor aux : lista) {
@@ -109,27 +92,17 @@ public class AutorPersistencia extends DAO {
             throw e;
         }
     }
-        
-    public void borrarListaAutorPorNombre(String nombre){
+
+    public void borrarListaAutorPorNombre(String nombre) {
         try {
-            Collection<Autor> lista = listaAutorPorNombre(nombre);
-            conectarBD();
+            ArrayList<Autor> lista = listaAutorPorNombre(nombre);
             for (Autor aux : lista) {
-                em.getTransaction().begin();
-                em.remove(aux);
-                em.getTransaction().commit();
+                borrarBD(aux);
             }
-            desconcectarBD();
         } catch (Exception e) {
-            desconcectarBD();
             throw e;
         }
-            
-    
-                
-            
+
     }
-    
+
 }
-    
-        

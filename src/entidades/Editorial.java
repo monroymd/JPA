@@ -28,9 +28,9 @@ public class Editorial implements Serializable {
         this.alta = true;
     }
 
-    public Editorial(String nombre, Boolean alta) {
+    public Editorial(String nombre) {
         this.nombre = nombre;
-        this.alta = alta;
+        this.alta = true;
     }
     
     

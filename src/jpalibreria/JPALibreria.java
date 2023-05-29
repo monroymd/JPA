@@ -17,12 +17,12 @@ public class JPALibreria {
 //        autor.editarAutor("Damian", "Mike");
 //        
 //        autor.guardarAutorPorNombre("Damian");
-//        autor.borrarAutorPorNombre("Mario");
+//        autor.borrarAutorPorNombre("Martin");
 //        
 //        autor.listaAutorPorNombre("Mario");
-//        autor.borrarListaAutorPorNombre("Martin");
-        ed.crearEditorial("Mongocho ed");
-        ed.editarEditorial("Mongocho ed", "Mongocho Ed.");
+        autor.borrarListaAutorPorNombre("Mario");
+//        ed.crearEditorial("Mongocho ed");
+//        ed.editarEditorial("Mongocho ed", "Mongocho Ed.");
     }
 
 }
